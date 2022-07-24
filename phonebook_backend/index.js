@@ -62,9 +62,27 @@ const generateId = () => {
 app.post('/api/people', (request, response) => {
   const body = request.body
 
-  if (!body.name || !body.number) {
+  const found = people.find(person => {
+    return person.name.toLowerCase() === body.name.toLowerCase()
+  })
+
+  console.log(found);
+
+  if (!body.name && !body.number) {
     return response.status(404).json({
-      error: "Contact information not complete"
+      error: "Name and number not provided"
+    })
+  } else if (!body.name) {
+    return response.status(404).json({
+      error: "Name not provided"
+    })
+  } else if (!body.number) {
+    return response.status(404).json({
+      error: "Number not provided"
+    })
+  } else if (found) {
+    return response.status(404).json({
+      error: "Name must be unique"
     })
   }
 
