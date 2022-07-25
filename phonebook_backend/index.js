@@ -1,7 +1,18 @@
 const express = require("express")
+const morgan = require("morgan")
 const app = express()
 app.use(express.json())
 const PORT = 3001
+
+morgan.token('body', (request, response) => JSON.stringify(request.body))
+
+app.use(morgan('tiny', {
+  skip: (request, response) => Object.keys(request.body).length !== 0
+}))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body', {
+  skip: (request, response) => Object.keys(request.body).length === 0
+}))
 
 let people = 
 [
@@ -62,12 +73,6 @@ const generateId = () => {
 app.post('/api/people', (request, response) => {
   const body = request.body
 
-  const found = people.find(person => {
-    return person.name.toLowerCase() === body.name.toLowerCase()
-  })
-
-  console.log(found);
-
   if (!body.name && !body.number) {
     return response.status(404).json({
       error: "Name and number not provided"
@@ -80,7 +85,7 @@ app.post('/api/people', (request, response) => {
     return response.status(404).json({
       error: "Number not provided"
     })
-  } else if (found) {
+  } else if (people.find(person => person.name.toLowerCase() === body.name.toLowerCase())) {
     return response.status(404).json({
       error: "Name must be unique"
     })
