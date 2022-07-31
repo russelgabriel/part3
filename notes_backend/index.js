@@ -1,7 +1,10 @@
 const express = require("express")
 const app = express()
+const cors = require('cors')
 app.use(express.json())
-const PORT = 3001
+app.use(express.static('build'))
+app.use(cors())
+const PORT = process.env.PORT || 3001
 
 let notes = [
     {
@@ -50,7 +53,7 @@ app.delete('/api/notes/:id', (request, response) => {
 })
 
 const generateId = () => {
-    const maxId = note.length > 0
+    const maxId = notes.length > 0
     ? Math.max(...notes.map(n => n.id))
     : 0
 
