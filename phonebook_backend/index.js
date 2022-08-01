@@ -21,23 +21,28 @@ let people =
 [
     { 
       "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
+      "name": "Tamilyn Te", 
+      "number": "347-366-1522"
     },
     { 
       "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
+      "name": "Russel Sy", 
+      "number": "646-787-5397"
     },
     { 
       "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
+      "name": "Grant Kind", 
+      "number": "1234567890"
     },
     { 
       "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
+      "name": "Sagar Risal", 
+      "number": "0987654321"
+    },
+    {
+      "id": 5,
+      "name": "Lillie Yao",
+      "number": "6574839201"
     }
 ]
 
