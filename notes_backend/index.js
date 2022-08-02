@@ -2,14 +2,25 @@ require("dotenv").config()
 const express = require("express")
 const cors = require('cors')
 const mongoose = require("mongoose")
+const morgan = require("morgan")
 const app = express()
-app.use(express.json())
 app.use(express.static('build'))
+app.use(express.json())
 app.use(cors())
 
 const Note = require("./models/note")
 
 const PORT = process.env.PORT
+
+morgan.token('body', (request, response) => JSON.stringify(request.body))
+
+app.use(morgan('tiny', {
+  skip: (request, response) => Object.keys(request.body).length !== 0
+}))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body', {
+  skip: (request, response) => Object.keys(request.body).length === 0
+}))
 
  
 // let notes = [
@@ -43,7 +54,7 @@ app.get('/api/notes', (request, response) => {
     })
 })
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/notes/:id', (request, response, next) => {
     // const id = Number(request.params.id)
     // const note = notes.find(note => note.id === id)
     // if (note) {
@@ -53,15 +64,21 @@ app.get('/api/notes/:id', (request, response) => {
     // }
 
     Note.findById(request.params.id).then(note => {
-        response.json(note)
+        if (note) {
+            response.json(note)
+        } else {
+            response.status(404).end()
+        }
     })
+    .catch(err => next(err))
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    notes = notes.filter(note => note.id !== id)
-
-    response.status(204).end()
+app.delete('/api/notes/:id', (request, response, next) => {
+    Note.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(err => next(err))
 })
 
 // const generateId = () => {
@@ -96,11 +113,38 @@ app.post('/api/notes', (request, response) => {
     // response.json(note)
 })
 
+app.put('/api/notes/:id', (request, response, next) => {
+    const body = request.body
+
+    const note = {
+        content: body.content,
+        important: body.important
+    }
+
+    Note.findByIdAndUpdate(request.params.id, note, {new: true})
+        .then(updatedNote => {
+            response.json(updatedNote)
+        })
+        .catch(err => next(err))
+})
+
 const unknownEndpoint = (request, response) => {
     response.status(404).send({error: "unknown endpoint"})
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message)
+
+    if (error.name === "CastError") {
+        return response.status(400).send({error: "malformatted id"})
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
