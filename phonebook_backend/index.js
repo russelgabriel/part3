@@ -67,46 +67,51 @@ app.delete('/api/people/:id', (request, response, next) => {
 //   return Math.floor(Math.random() * (100000))
 // }
 
-app.post('/api/people', (request, response) => {
-  const body = request.body
-
-  if (!body.name && !body.number) {
-    return response.status(404).json({
-      error: "Name and number not provided"
-    })
-  } else if (!body.name) {
-    return response.status(404).json({
-      error: "Name not provided"
-    })
-  } else if (!body.number) {
-    return response.status(404).json({
-      error: "Number not provided"
-    })}
+app.post('/api/people', (request, response, next) => {
+  // if (!body.name && !body.number) {
+  //   return response.status(404).json({
+  //     error: "Name and number not provided"
+  //   })
+  // } else if (!body.name) {
+  //   return response.status(404).json({
+  //     error: "Name not provided"
+  //   })
+  // } else if (!body.number) {
+  //   return response.status(404).json({
+  //     error: "Number not provided"
+  //   })}
   // } else if (people.find(person => person.name.toLowerCase() === body.name.toLowerCase())) {
   //   return response.status(404).json({
   //     error: "Name must be unique"
   //   })
   // }
 
+  const {name, number} = request.body
+
   const person = new Person({
-    name: body.name,
-    number: body.number,
+    name: name,
+    number: number,
   })
 
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
+  .catch(err => next(err))
 })
 
 app.put('/api/people/:id', (request, response, next) => {
-  const body = request.body
+  const {name, number} = request.body
 
-  const person = {
-    name: body.name,
-    number: body.number
-  }
+  // const person = {
+  //   name: body.name,
+  //   number: body.number
+  // }
 
-  Person.findByIdAndUpdate(request.params.id, person, {new: true})
+  Person.findByIdAndUpdate(
+    request.params.id, 
+    {name, number}, 
+    {new: true, runValidators: true, context: "query"}
+    )
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -124,6 +129,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({error: "malformatted id"})
+  } else if (error.name === "ValidationError") {
+    return response.status(400).send({error: error.message})
   }
 
   next(error)
