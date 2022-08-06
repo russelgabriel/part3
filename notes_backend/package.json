@@ -10,7 +10,8 @@
     "build:ui": "rm -rf build && cd /Users/russelsy/Desktop/fso/part2/practice2 && npm run build && cp -r build /Users/russelsy/Desktop/fso/part3/notes_backend",
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "author": "Russel Sy",
   "license": "ISC",
@@ -23,6 +24,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.21.0",
+    "eslint-plugin-react": "^7.30.1",
     "nodemon": "^2.0.19"
   },
   "proxy": "https://localhost:3001"

@@ -11,7 +11,8 @@
     "deploy": "git push heroku main",
     "deploy:backend": "git add . && git commit -m backendbuild && npm run deploy",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "author": "Russel Sy",
   "license": "ISC",
@@ -23,6 +24,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.21.0",
+    "eslint-plugin-react": "^7.30.1",
     "nodemon": "^2.0.19"
   }
 }

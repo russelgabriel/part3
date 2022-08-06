@@ -1,41 +1,43 @@
+/* eslint-disable no-unused-vars */
 require("dotenv").config()
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
 const app = express()
 app.use(express.json())
-app.use(express.static('build'))
+app.use(express.static("build"))
 app.use(cors())
+// eslint-disable-next-line no-undef
 const PORT = process.env.PORT
 const Person = require("./models/person")
 
-morgan.token('body', (request, response) => JSON.stringify(request.body))
+morgan.token("body", (request, response) => JSON.stringify(request.body))
 
-app.use(morgan('tiny', {
+app.use(morgan("tiny", {
   skip: (request, response) => Object.keys(request.body).length !== 0
 }))
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body', {
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body", {
   skip: (request, response) => Object.keys(request.body).length === 0
 }))
 
-app.get('/api/people', (request, response) => {
+app.get("/api/people", (request, response) => {
   Person.find({}).then(people => {
     response.json(people)
   })
 })
 
-app.get('/info', (request, response, next) => {
+app.get("/info", (request, response, next) => {
   Person.countDocuments().then(numPeople => {
     response.send(
       `<p>Phonebook has entries for ${numPeople} people</p>
       <p>${new Date()}</p>`
     )
   })
-  .catch(err => next(err))
+    .catch(err => next(err))
 })
 
-app.get('/api/people/:id', (request, response, next) => {
+app.get("/api/people/:id", (request, response, next) => {
   // const id = Number(request.params.id)
   // const person = people.find(person => person.id === id)
   // if (person) {
@@ -51,10 +53,10 @@ app.get('/api/people/:id', (request, response, next) => {
       response.status(404).end()
     }
   })
-  .catch(err => next(err))
+    .catch(err => next(err))
 })
 
-app.delete('/api/people/:id', (request, response, next) => {
+app.delete("/api/people/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
@@ -67,7 +69,7 @@ app.delete('/api/people/:id', (request, response, next) => {
 //   return Math.floor(Math.random() * (100000))
 // }
 
-app.post('/api/people', (request, response, next) => {
+app.post("/api/people", (request, response, next) => {
   // if (!body.name && !body.number) {
   //   return response.status(404).json({
   //     error: "Name and number not provided"
@@ -96,10 +98,10 @@ app.post('/api/people', (request, response, next) => {
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
-  .catch(err => next(err))
+    .catch(err => next(err))
 })
 
-app.put('/api/people/:id', (request, response, next) => {
+app.put("/api/people/:id", (request, response, next) => {
   const {name, number} = request.body
 
   // const person = {
@@ -111,7 +113,7 @@ app.put('/api/people/:id', (request, response, next) => {
     request.params.id, 
     {name, number}, 
     {new: true, runValidators: true, context: "query"}
-    )
+  )
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -141,5 +143,5 @@ const errorHandler = (error, request, response, next) => {
 app.use(errorHandler)
 
 app.listen(PORT, () => {
-    console.log(`Phonebook server running on port ${PORT}`);
+  console.log(`Phonebook server running on port ${PORT}`)
 })
